@@ -39,5 +39,76 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // -------------------------------------------------------------------
+    // 1. 指令解碼與 A 暫存器
+    // -------------------------------------------------------------------
+    // 判斷是 A 指令還是 C 指令
+    Not(in=instruction[15], out=isA);
+    Not(in=isA, out=isC);
+
+    // 進入 A 暫存器的值：若是 A 指令則取 instruction，若是 C 指令則取 ALU 的輸出
+    Mux16(a=instruction, b=outALU, sel=instruction[15], out=inA);
+
+    // A 暫存器的載入條件：A 指令，或 (C 指令 且 d1 位元為 1)
+    And(a=isC, b=instruction[5], out=isCDestA);
+    Or(a=isA, b=isCDestA, out=loadA);
+
+    // A 暫存器（輸出同時接至 addressM 作為資料記憶體位址）
+    ARegister(in=inA, load=loadA, out=outA, out[0..14]=addressM);
+
+    // -------------------------------------------------------------------
+    // 2. D 暫存器與 ALU 輸入選擇
+    // -------------------------------------------------------------------
+    // D 暫存器的載入條件：C 指令 且 d2 位元為 1
+    And(a=isC, b=instruction[4], out=loadD);
+    DRegister(in=outALU, load=loadD, out=outD);
+
+    // 決定 ALU 的 y 輸入：依據 a 位元 (instruction[12]) 選擇 A 暫存器還是 inM
+    Mux16(a=outA, b=inM, sel=instruction[12], out=outAM);
+
+    // -------------------------------------------------------------------
+    // 3. ALU 計算
+    // -------------------------------------------------------------------
+    ALU(
+        x=outD, 
+        y=outAM, 
+        zx=instruction[11], 
+        nx=instruction[10], 
+        zy=instruction[9], 
+        ny=instruction[8], 
+        f=instruction[7], 
+        no=instruction[6], 
+        out=outALU, 
+        out=outM, 
+        zr=zr, 
+        ng=ng
+    );
+
+    // 輸出 writeM：C 指令 且 d3 位元為 1
+    And(a=isC, b=instruction[3], out=writeM);
+
+    // -------------------------------------------------------------------
+    // 4. 跳轉判斷 (PC 控制邏輯)
+    // -------------------------------------------------------------------
+    // 判斷 ALU 輸出是否大於 0 (即既不為 0 也非負數)
+    Or(a=zr, b=ng, out=zrOrNg);
+    Not(in=zrOrNg, out=pos);
+
+    // 各跳轉條件檢測
+    And(a=instruction[2], b=ng, out=jlt);  // j1: out < 0
+    And(a=instruction[1], b=zr, out=jeq);  // j2: out == 0
+    And(a=instruction[0], b=pos, out=jgt); // j3: out > 0
+
+    // 是否符合任一跳轉條件
+    Or(a=jlt, b=jeq, out=jle);
+    Or(a=jle, b=jgt, out=jumpCond);
+
+    // 只有在 C 指令時跳轉條件才生效
+    And(a=isC, b=jumpCond, out=loadPC);
+
+    // PC 晶片：
+    // 若符合跳轉條件 (loadPC=1)，則載入 A 暫存器的位址；
+    // 否則正常遞增 (inc=true)；
+    // reset=1 時重設為 0。
+    PC(in=outA, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 }
