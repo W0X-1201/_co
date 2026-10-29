@@ -67,3 +67,11 @@ veryl2chip 是一個基於 Rust 語言、結合 Wasm 技術開發的輕量級端
 veryl2chip 是一套極具教育意義的現代化開源數位 IC 設計工具鏈。它並非商用 EDA 的直接替代品，而更適合用於數位邏輯教學、開源硬體入門、概念驗證與小型原型設計。
 
 其最大貢獻在於將原本門檻極高的 IC 設計流程整合至瀏覽器中，讓更多人能夠實際體驗從 RTL 到 GDSII 的完整流程。若能釐清其定位並強化對限制的說明，將能更準確地傳達此工具的真實價值。
+
+## 七、 附錄
+
+### 7.1 與 AI 對話紀錄
+
+根據授課老師規定，本報告撰寫與修訂過程中所使用之 Google AI Studio 對話紀錄如下：
+
+- **對話連結：** [https://aistudio.google.com/prompts/1Dw1-olSie7FUWeE10cy07JbCXTMBZxP7](https://aistudio.google.com/prompts/1Dw1-olSie7FUWeE10cy07JbCXTMBZxP7)
