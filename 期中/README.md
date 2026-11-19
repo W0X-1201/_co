@@ -20,7 +20,7 @@
 ### 請假證明
 
 #### 第 5 週請假證明
-<img src="貼上第5週圖片網址" width="350">
+<img src="https://github.com/user-attachments/assets/5de158ba-c402-42db-ad7d-1178bc3f54c0" width="380">
 
 #### 第 6 週請假證明
 <img src="https://github.com/user-attachments/assets/9f10f9eb-819f-4f65-92ac-dd8d3dcc3ab7" width="350">
